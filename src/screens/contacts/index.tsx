@@ -1,0 +1,15 @@
+import { View } from "react-native";
+import { AddContactPopover } from "./add-contact-popover";
+import { ContactList } from "./contact-list";
+
+export default function ContactScreen() {
+  return (
+    <View className="flex-1 relative">
+      <ContactList />
+      {/*<Text>{JSON.stringify(selectedContact, null, 2)}</Text>*/}
+      <View className="absolute right-4 bottom-4">
+        <AddContactPopover />
+      </View>
+    </View>
+  );
+}

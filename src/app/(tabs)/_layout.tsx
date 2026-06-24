@@ -1,29 +1,50 @@
-import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import type { ComponentProps, JSX } from "react";
-import type { ColorValue } from "react-native";
+import { FontAwesome6 } from "@expo/vector-icons";
 
-type IoniconName = ComponentProps<typeof Ionicons>["name"];
+import { reloadAppAsync } from "expo";
+import { TouchableOpacity } from "react-native";
+import { Button } from "heroui-native";
 
-function TabIcon({ name, color }: { name: IoniconName; color: ColorValue }): JSX.Element {
-  return <Ionicons name={name} size={24} color={color} />;
-}
+const iconSize = 20;
 
-export default function TabsLayout(): JSX.Element {
+export default function TabsLayout() {
   return (
-    <Tabs screenOptions={{ headerShown: false }}>
+    <Tabs
+      screenOptions={{
+        headerRight: () => (
+          <Button
+            className="size-12 rounded-r-none text-cyan-700"
+            onPress={() => reloadAppAsync("Reloading app")}
+          />
+        ),
+        tabBarPosition: "bottom",
+        tabBarStyle: { height: 60 },
+        tabBarButton: (props) => <TouchableOpacity {...(props as any)} />,
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
-          tabBarIcon: ({ color }) => <TabIcon name="home-outline" color={color} />,
+          title: "Contacts",
+          tabBarIcon: ({ color }) => (
+            <FontAwesome6 name="contact-book" size={iconSize} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="chats"
         options={{
-          title: "Explore",
-          tabBarIcon: ({ color }) => <TabIcon name="compass-outline" color={color} />,
+          title: "Chats",
+          tabBarIcon: ({ color }) => <FontAwesome6 name="message" size={iconSize} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="locations"
+        options={{
+          title: "Locations",
+          tabBarIcon: ({ color }) => (
+            <FontAwesome6 name="map-location-dot" size={iconSize} color={color} />
+          ),
         }}
       />
     </Tabs>
