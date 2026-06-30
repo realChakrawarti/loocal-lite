@@ -10,13 +10,16 @@ export default function AddCTA({
   return (
     <Popover presentation="bottom-sheet">
       <Popover.Trigger ref={ref} asChild>
-        <Button className="size-13 flex justify-center items-center rounded-full">
+        <Button className="flex size-13 items-center justify-center rounded-full">
           <FontAwesome6 name="add" size={20} color={"#fff"} />
         </Button>
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Overlay />
-        <Popover.Content contentContainerClassName="p-0" presentation="bottom-sheet">
+        <Popover.Content
+          contentContainerClassName="p-0"
+          presentation="bottom-sheet"
+        >
           {children}
         </Popover.Content>
       </Popover.Portal>

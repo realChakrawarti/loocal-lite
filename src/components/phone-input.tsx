@@ -21,7 +21,11 @@ export default function PhoneInput({ trigger, ...props }: PhoneInputProps) {
         />
         <InputGroup.Suffix>
           <Pressable onPress={trigger} hitSlop={20}>
-            <MaterialCommunityIcons name="phone-remove" size={20} color="black" />
+            <MaterialCommunityIcons
+              name="phone-remove"
+              size={20}
+              color="black"
+            />
           </Pressable>
         </InputGroup.Suffix>
       </InputGroup>

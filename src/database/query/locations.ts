@@ -10,14 +10,27 @@ type Params = {
   description: string;
 };
 
-export async function addLocation({ digipin, latitude, longitude, title, description }: Params) {
+export async function addLocation({
+  digipin,
+  latitude,
+  longitude,
+  title,
+  description,
+}: Params) {
   const db = getDb();
   if (!db) {
     return;
   }
 
   const id = getUUID();
-  await db.runAsync(sql.location.insert, [id, digipin, latitude, longitude, title, description]);
+  await db.runAsync(sql.location.insert, [
+    id,
+    digipin,
+    latitude,
+    longitude,
+    title,
+    description,
+  ]);
 }
 
 export async function getAllLocations() {

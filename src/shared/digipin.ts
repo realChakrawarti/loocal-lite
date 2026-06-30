@@ -23,8 +23,10 @@ const BOUNDS = {
 };
 
 function getDigiPin(lat: number, lon: number) {
-  if (lat < BOUNDS.minLat || lat > BOUNDS.maxLat) throw new Error("Latitude out of range");
-  if (lon < BOUNDS.minLon || lon > BOUNDS.maxLon) throw new Error("Longitude out of range");
+  if (lat < BOUNDS.minLat || lat > BOUNDS.maxLat)
+    throw new Error("Latitude out of range");
+  if (lon < BOUNDS.minLon || lon > BOUNDS.maxLon)
+    throw new Error("Longitude out of range");
 
   let minLat = BOUNDS.minLat;
   let maxLat = BOUNDS.maxLat;

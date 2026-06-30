@@ -1,4 +1,4 @@
-import AddCTA from "@/widgets/add-cta";
+import AddCTA from "@/components/add-cta";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { ListGroup } from "heroui-native/list-group";
 import { Separator } from "heroui-native/separator";

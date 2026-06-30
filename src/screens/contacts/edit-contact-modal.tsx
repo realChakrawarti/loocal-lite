@@ -2,23 +2,31 @@ import contactStore from "@/store/contact-store";
 import {
   Avatar,
   Button,
+  Checkbox,
+  ControlField,
+  Description,
   Input,
+  InputGroup,
   Label,
   Skeleton,
   Spinner,
   TextField,
   useAvatar,
+  useToast,
 } from "heroui-native";
-import { View, ScrollView } from "react-native";
+import { View, ScrollView, Text } from "react-native";
 import { regex } from "arkregex";
 import { useQuery } from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
 import { ExistingPhone } from "expo-contacts";
 import { Stack } from "expo-router";
-import PhoneInput from "@/widgets/phone-input";
+import PhoneInput from "@/components/phone-input";
 import ContactCaptureModal from "./contact-capture-modal";
 import { useStore } from "zustand";
 import { FontAwesome6 } from "@expo/vector-icons";
+import { deleteImage, imagePicker } from "@/shared/image-utils";
+import { useEffect, useState } from "react";
+import { addContact } from "@/database/query";
 
 function normalizePhoneNumber(phone: string) {
   const phoneRegex = regex("^(?:\\+91|0)?([6-9]\\d{9})$");
@@ -48,7 +56,6 @@ function uniquePhoneNumbers(phones: ExistingPhone[]) {
   phones.forEach((phone) => {
     const normalizedPhone = normalizePhoneNumber(phone.number || "");
     if (normalizedPhone && !numbers.includes(normalizedPhone)) {
-      console.log("Found ", normalizedPhone, ", pushed,");
       return numbers.push(normalizedPhone);
     }
   });
@@ -62,7 +69,7 @@ function phones(phones: ExistingPhone[] | undefined) {
   const phoneNumbers = uniquePhoneNumbers(phones);
   return phoneNumbers.map((phone) => ({
     number: phone,
-    platform: [],
+    platform: { whatsapp: false },
   }));
 }
 
@@ -76,7 +83,11 @@ function AvatarContent() {
 
 export default function EditContactModal() {
   const contact = contactStore.getState().contact;
-  const capturedImageUri = useStore(contactStore, (state) => state.capturedImageUri);
+  const [showCameraModal, setShowCameraModal] = useState(false);
+  const resizedImageUri = useStore(contactStore, (state) => state.resizedImageUri);
+  const setResizedImageUri = useStore(contactStore, (state) => state.setResizedImageUri);
+
+  const { toast } = useToast();
 
   const { data: contactDetails, isLoading } = useQuery({
     queryKey: ["contact"],
@@ -94,10 +105,47 @@ export default function EditContactModal() {
       phones: phones(contactDetails?.phones),
     },
     onSubmit: async ({ value }) => {
-      // Do something with form data
-      console.log(value);
+      console.log(JSON.stringify(value));
+      if (value.phones.length) {
+        const primary = value.phones[0];
+        const secondary = value.phones[1] || null;
+        const tertiary = value.phones[2] || null;
+        await addContact(value.fullname, value.thumbnail, primary, secondary, tertiary);
+      }
+      toast.show("No contact number entered");
     },
   });
+
+  useEffect(() => {
+    if (resizedImageUri) {
+      form.setFieldValue("thumbnail", resizedImageUri);
+    }
+  }, [resizedImageUri]);
+
+  function resetContactImage() {
+    if (resizedImageUri) {
+      try {
+        // delete image which is captured or saved
+        if (resizedImageUri.includes("in.lite.loocal")) {
+          deleteImage(resizedImageUri);
+        }
+        setResizedImageUri(null);
+        form.setFieldValue("thumbnail", "");
+        toast.show("Removed from cache successfully.");
+      } catch (err) {
+        console.log(err);
+        toast.show("No such file exists.");
+      }
+    }
+    return;
+  }
+
+  async function pickFromGallery() {
+    const imageUri = await imagePicker();
+    if (imageUri) {
+      setResizedImageUri(imageUri);
+    }
+  }
 
   return (
     <>
@@ -110,21 +158,58 @@ export default function EditContactModal() {
       />
       <ScrollView>
         {!isLoading ? (
-          <View className="p-3 flex-1 flex items-center gap-8">
+          <View className="flex flex-1 items-center gap-8 p-3">
             <View className="flex items-center gap-4">
-              <Avatar className="size-32" alt={contactDetails?.fullname}>
-                <Avatar.Image
-                  className="rounded-2xl"
-                  source={{
-                    uri: contactDetails?.thumbnail || capturedImageUri || undefined,
-                  }}
+              <form.Field
+                name="thumbnail"
+                children={({ state }) => (
+                  <Avatar className="size-32" alt={contactDetails?.fullname}>
+                    <Avatar.Image
+                      className="rounded-full"
+                      source={{
+                        uri: state.value ?? undefined,
+                      }}
+                    />
+                    <AvatarContent />
+                    <Avatar.Fallback delayMs={300}>
+                      <FontAwesome6 name="user-circle" size={128} color="black" />
+                    </Avatar.Fallback>
+                  </Avatar>
+                )}
+              />
+
+              <View className="flex flex-row gap-3 items-center">
+                <Button
+                  aria-label="Take picture using Camera"
+                  onPress={() => setShowCameraModal(true)}
+                  variant="outline"
+                >
+                  <FontAwesome6 name="camera" size={20} color="black" />
+                </Button>
+
+                <Button
+                  aria-label="Pick picture from gallery"
+                  variant="outline"
+                  onPress={pickFromGallery}
+                >
+                  <FontAwesome6 name="image" size={20} color="black" />
+                </Button>
+
+                <form.Subscribe
+                  selector={(state) => state.values.thumbnail}
+                  children={(thumbnail) =>
+                    thumbnail ? (
+                      <Button
+                        aria-label="Reset profile picture"
+                        variant="outline"
+                        onPress={resetContactImage}
+                      >
+                        <FontAwesome6 name="trash" size={20} color="black" />
+                      </Button>
+                    ) : null
+                  }
                 />
-                <AvatarContent />
-                <Avatar.Fallback delayMs={300}>
-                  <FontAwesome6 name="user-circle" size={128} color="black" />
-                </Avatar.Fallback>
-              </Avatar>
-              <ContactCaptureModal />
+              </View>
             </View>
             <View className="w-full gap-4" id="edit-contact-form">
               <form.Field
@@ -133,6 +218,7 @@ export default function EditContactModal() {
                   <TextField isRequired>
                     <Label>Full name</Label>
                     <Input
+                      className="text-base"
                       value={state.value}
                       onChangeText={handleChange}
                       placeholder="Full name"
@@ -148,22 +234,58 @@ export default function EditContactModal() {
                     <>
                       {state.value.map((_, idx) => {
                         return (
-                          <form.Field key={idx} name={`phones[${idx}].number`}>
-                            {(subField) => {
-                              return (
-                                <TextField isRequired={idx + 1 === 1}>
-                                  <Label>{phoneMaps.get(`${idx + 1}`)}</Label>
-                                  <PhoneInput
-                                    trigger={() => removeValue(idx)}
-                                    keyboardType="phone-pad"
-                                    value={subField.state.value}
-                                    onChangeText={subField.handleChange}
-                                    placeholder={phoneMaps.get(`${idx + 1}`)}
-                                  />
-                                </TextField>
-                              );
-                            }}
-                          </form.Field>
+                          <View key={idx}>
+                            <form.Field key={idx} name={`phones[${idx}].number`}>
+                              {(subField) => {
+                                return (
+                                  <TextField isRequired={idx + 1 === 1}>
+                                    <Label>{phoneMaps.get(`${idx + 1}`)}</Label>
+                                    <PhoneInput
+                                      className="text-base"
+                                      trigger={() => removeValue(idx)}
+                                      keyboardType="phone-pad"
+                                      value={subField.state.value}
+                                      onChangeText={subField.handleChange}
+                                      placeholder={phoneMaps.get(`${idx + 1}`)}
+                                    />
+                                  </TextField>
+                                );
+                              }}
+                            </form.Field>
+                            <form.Field mode="array" name={`phones[${idx}].platform.whatsapp`}>
+                              {(subField) => {
+                                return (
+                                  <ControlField
+                                    className="mt-2"
+                                    isSelected={subField.state.value}
+                                    onSelectedChange={subField.handleChange}
+                                  >
+                                    <View className="flex flex-row gap-2">
+                                      <ControlField.Indicator variant="checkbox" />
+                                      <View className="flex-1 gap-2">
+                                        <View className="flex flex-row gap-2 items-center ">
+                                          <FontAwesome6 name="whatsapp" size={20} color="green" />
+                                          <Label>Whatsapp</Label>
+                                        </View>
+                                        <Description>
+                                          Whatsapp associated with this number
+                                        </Description>
+                                      </View>
+                                    </View>
+                                  </ControlField>
+
+                                  // <Label>Whatsapp</Label>
+                                  //   <Checkbox
+                                  //     animation="disable-all"
+                                  //     isSelected={subField.state.value}
+                                  //     onSelectedChange={subField.handleChange}
+                                  //   >
+                                  //     <Checkbox.Indicator />
+                                  //   </Checkbox>
+                                );
+                              }}
+                            </form.Field>
+                          </View>
                         );
                       })}
                       <Button
@@ -179,13 +301,18 @@ export default function EditContactModal() {
             </View>
           </View>
         ) : (
-          <View className="p-3 flex-1 flex items-center justify-center">
+          <View className="flex flex-1 items-center justify-center p-3">
             <Spinner size="lg" color="default">
               <Spinner.Indicator animation={{ rotation: { speed: 1 } }} />
             </Spinner>
           </View>
         )}
       </ScrollView>
+
+      <ContactCaptureModal
+        setShowCameraModal={setShowCameraModal}
+        showCameraModal={showCameraModal}
+      />
     </>
   );
 }

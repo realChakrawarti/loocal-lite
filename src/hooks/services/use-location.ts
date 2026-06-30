@@ -8,22 +8,34 @@ export type LocationCoordinates = {
   timestamp: number;
 };
 
-async function openMappls(latitude: number, longitude: number, destinationName: string) {
+async function openMappls(
+  latitude: number,
+  longitude: number,
+  destinationName: string
+) {
   const canOpenMappls = await Linking.canOpenURL("mappls://");
   if (canOpenMappls) {
-    await Linking.openURL(`mappls://navigation?places=${latitude},${longitude},${destinationName}`);
+    await Linking.openURL(
+      `mappls://navigation?places=${latitude},${longitude},${destinationName}`
+    );
   } else {
     await Linking.openURL(`https://www.mappls.com/@${latitude},${longitude}`);
   }
 }
 
-async function openGoogleMaps(latitude: number, longitude: number, destinationName: string) {
+async function openGoogleMaps(
+  latitude: number,
+  longitude: number,
+  destinationName: string
+) {
   // Encode name for URL (replace spaces with +, etc.)
   const encodedName = encodeURIComponent(destinationName);
 
   const canOpenGMaps = await Linking.canOpenURL("google.navigation");
   if (canOpenGMaps) {
-    await Linking.openURL(`google.navigation:q=${latitude},${longitude}(${encodedName})`);
+    await Linking.openURL(
+      `google.navigation:q=${latitude},${longitude}(${encodedName})`
+    );
   } else {
     const webUrl = `https://www.google.com/maps?q=${latitude},${longitude}(${encodedName})`;
     await Linking.openURL(webUrl);

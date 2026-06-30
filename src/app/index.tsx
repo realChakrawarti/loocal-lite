@@ -41,15 +41,15 @@ export default function SplashScreen() {
   const logo = require("../../assets/images/splash-icon.png");
 
   return (
-    <View className="items-center justify-center flex-1">
-      <View className="gap-2 items-center ">
+    <View className="flex-1 items-center justify-center">
+      <View className="items-center gap-2">
         <Image
           contentPosition="bottom center"
           source={logo}
           style={{ width: 200, height: 100 }}
           contentFit="contain"
         />
-        <Text className="text-[#6e6e6eaa] text-base tracking-wide font-bold">
+        <Text className="text-base font-bold tracking-wide text-[#6e6e6eaa]">
           Manage contacts, locations and notes
         </Text>
         <Spinner
@@ -63,17 +63,17 @@ export default function SplashScreen() {
       <View className="absolute bottom-1/5">
         {authenticated === AuthenticatedState.failed ? (
           <Button
-            className="flex flex-col size-auto gap-2 items-center"
+            className="flex size-auto flex-col items-center gap-2"
             variant="ghost"
             onPress={() => {
               setAuthenticated(AuthenticatedState.pending);
               handleLocalAuthentication();
             }}
           >
-            <View className="size-18 justify-center items-center rounded-full border border-[#6e6e6eaa]">
+            <View className="size-18 items-center justify-center rounded-full bg-teal-300/20">
               <FontAwesome6 name="fingerprint" size={40} color="#6e6e6eaa" />
             </View>
-            <Text className="text-[#6e6e6eaa] tracking-wide">Authenticate</Text>
+            <Text className="tracking-wide text-[#6e6e6eaa]">Authenticate to continue</Text>
           </Button>
         ) : null}
       </View>

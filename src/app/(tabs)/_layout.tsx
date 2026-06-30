@@ -35,7 +35,9 @@ export default function TabsLayout() {
         name="chats"
         options={{
           title: "Chats",
-          tabBarIcon: ({ color }) => <FontAwesome6 name="message" size={iconSize} color={color} />,
+          tabBarIcon: ({ color }) => (
+            <FontAwesome6 name="message" size={iconSize} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
@@ -43,7 +45,11 @@ export default function TabsLayout() {
         options={{
           title: "Locations",
           tabBarIcon: ({ color }) => (
-            <FontAwesome6 name="map-location-dot" size={iconSize} color={color} />
+            <FontAwesome6
+              name="map-location-dot"
+              size={iconSize}
+              color={color}
+            />
           ),
         }}
       />

@@ -3,7 +3,7 @@ import { StatusBar } from "expo-status-bar";
 
 import "../global.css";
 import useSplashInitialize from "@/hooks/use-splash-initialize";
-import Provider from "@/widgets/provider";
+import Provider from "@/components/provider";
 import contactStore from "@/store/contact-store";
 
 export default function RootLayout() {

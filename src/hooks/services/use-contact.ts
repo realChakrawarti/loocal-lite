@@ -1,5 +1,9 @@
 import log from "@/shared/logger";
-import { Contact, requestPermissionsAsync, getPermissionsAsync } from "expo-contacts";
+import {
+  Contact,
+  requestPermissionsAsync,
+  getPermissionsAsync,
+} from "expo-contacts";
 import * as Linking from "expo-linking";
 
 async function openSettings() {
