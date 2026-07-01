@@ -19,7 +19,7 @@ export default function ViewModal({
   return (
     <Modal visible={visible} {...rest}>
       <SafeAreaView style={{ flex: 1 }}>
-        <View className="flex flex-1 justify-end px-4">
+        <View className="flex flex-1 justify-end p-4">
           <View className="flex h-24 flex-row items-center gap-8">
             <Ionicons
               onTouchEnd={() => setVisible(false)}

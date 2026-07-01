@@ -1,6 +1,7 @@
 import { openDatabaseSync, type SQLiteDatabase } from "expo-sqlite";
 import createTables from "./tables";
 import logger from "@/shared/logger";
+import { DATABASE_NAME } from "@/shared/constants";
 
 let db: SQLiteDatabase | null = null;
 
@@ -9,9 +10,9 @@ function setupDb(): SQLiteDatabase | null {
     if (db) {
       return db;
     } else {
-      db = openDatabaseSync("device.db");
-      db.execSync("PRAGMA journal_mode = WAL");
-      db.execSync("PRAGMA foreign_keys = ON");
+      db = openDatabaseSync(DATABASE_NAME);
+      db.execSync("PRAGMA journal_mode = WAL;");
+      db.execSync("PRAGMA foreign_keys = ON;");
       logger.info("Database is open and is on path: ", db.databasePath);
       createTables(db);
       return db;

@@ -133,9 +133,6 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     flexShrink: 1,
     gap: 12,
-    borderWidth: 1,
-    borderStyle: "dashed",
-    borderColor: "orangered",
   },
   camera: { aspectRatio: 1, borderRadius: 12 },
   preview: {

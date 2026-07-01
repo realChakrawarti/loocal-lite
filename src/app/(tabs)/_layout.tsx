@@ -1,21 +1,20 @@
-import { Tabs } from "expo-router";
+import { Tabs, useRouter } from "expo-router";
 import { FontAwesome6 } from "@expo/vector-icons";
-
-import { reloadAppAsync } from "expo";
 import { TouchableOpacity } from "react-native";
 import { Button } from "heroui-native";
 
 const iconSize = 20;
 
 export default function TabsLayout() {
+  const router = useRouter();
+
   return (
     <Tabs
       screenOptions={{
         headerRight: () => (
-          <Button
-            className="size-12 rounded-r-none text-cyan-700"
-            onPress={() => reloadAppAsync("Reloading app")}
-          />
+          <Button variant="ghost" onPress={() => router.push("/settings")}>
+            <FontAwesome6 name="gears" size={24} color="black" />
+          </Button>
         ),
         tabBarPosition: "bottom",
         tabBarStyle: { height: 60 },
@@ -35,9 +34,7 @@ export default function TabsLayout() {
         name="chats"
         options={{
           title: "Chats",
-          tabBarIcon: ({ color }) => (
-            <FontAwesome6 name="message" size={iconSize} color={color} />
-          ),
+          tabBarIcon: ({ color }) => <FontAwesome6 name="message" size={iconSize} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -45,11 +42,7 @@ export default function TabsLayout() {
         options={{
           title: "Locations",
           tabBarIcon: ({ color }) => (
-            <FontAwesome6
-              name="map-location-dot"
-              size={iconSize}
-              color={color}
-            />
+            <FontAwesome6 name="map-location-dot" size={iconSize} color={color} />
           ),
         }}
       />

@@ -26,13 +26,13 @@ const contact = {
 		fullname TEXT NOT NULL,
 		thumbnail TEXT,
 		primary_number TEXT CHECK(json_valid(primary_number)) NOT NULL,
-		secondary_number TEXT CHECK(json_valid(secondary_number)),
-		tertiary_number TEXT CHECK(json_valid(tertiary_number)),
+		secondary_number TEXT CHECK(secondary_number IS NULL OR json_valid(secondary_number)),
+		tertiary_number TEXT CHECK(tertiary_number IS NULL OR json_valid(tertiary_number)),
 	 	created_at INTEGER DEFAULT (strftime('%s','now')),
     updated_at INTEGER DEFAULT (strftime('%s','now'))
 	);
 	`,
-  getAll: "SELECT * FROM locations;",
+  getAll: "SELECT * FROM contacts;",
   insert:
     "INSERT INTO contacts (id, fullname, thumbnail, primary_number, secondary_number, tertiary_number) VALUES (?, ?, ?, ?, ?, ?);",
 };

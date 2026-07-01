@@ -2,11 +2,9 @@ import contactStore from "@/store/contact-store";
 import {
   Avatar,
   Button,
-  Checkbox,
   ControlField,
   Description,
   Input,
-  InputGroup,
   Label,
   Skeleton,
   Spinner,
@@ -14,7 +12,7 @@ import {
   useAvatar,
   useToast,
 } from "heroui-native";
-import { View, ScrollView, Text } from "react-native";
+import { View, ScrollView } from "react-native";
 import { regex } from "arkregex";
 import { useQuery } from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
@@ -111,8 +109,9 @@ export default function EditContactModal() {
         const secondary = value.phones[1] || null;
         const tertiary = value.phones[2] || null;
         await addContact(value.fullname, value.thumbnail, primary, secondary, tertiary);
+      } else {
+        toast.show("No contact number entered");
       }
-      toast.show("No contact number entered");
     },
   });
 
@@ -158,7 +157,7 @@ export default function EditContactModal() {
       />
       <ScrollView>
         {!isLoading ? (
-          <View className="flex flex-1 items-center gap-8 p-3">
+          <View className="flex flex-1 items-center gap-8 p-4">
             <View className="flex items-center gap-4">
               <form.Field
                 name="thumbnail"

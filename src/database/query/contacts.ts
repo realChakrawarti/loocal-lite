@@ -35,10 +35,11 @@ export async function addContact(
       fullname,
       thumbnail,
       JSON.stringify(primary_number),
-      JSON.stringify(secondary_number),
-      JSON.stringify(tertiary_number),
+      secondary_number ? JSON.stringify(secondary_number) : null,
+      tertiary_number ? JSON.stringify(tertiary_number) : null,
     ]);
   } catch (err) {
+    console.log("Some error occured!");
     console.error(JSON.stringify(err));
   }
 }
