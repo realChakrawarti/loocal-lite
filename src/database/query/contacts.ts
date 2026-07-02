@@ -7,12 +7,23 @@ type ContactNumber = {
   platform: { whatsapp: boolean };
 };
 
+type Contacts = {
+  id: string;
+  created_at: number;
+  updated_at: number;
+  fullname: string;
+  thumbnail: string;
+  primary_number: ContactNumber;
+  secondary_number: ContactNumber | null;
+  tertiary_number: ContactNumber | null;
+};
+
 export async function getAllContacts() {
   const db = getDb();
   if (!db) {
     return;
   }
-  const result = await db.getAllAsync(sql.contact.getAll);
+  const result = await db.getAllAsync<Contacts>(sql.contact.getAll);
   return result;
 }
 

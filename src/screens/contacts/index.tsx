@@ -4,9 +4,8 @@ import { ContactList } from "./contact-list";
 
 export default function ContactScreen() {
   return (
-    <View className="relative flex-1">
+    <View className="relative flex-1 p-4">
       <ContactList />
-      {/*<Text>{JSON.stringify(selectedContact, null, 2)}</Text>*/}
       <View className="absolute right-4 bottom-4">
         <AddContactPopover />
       </View>

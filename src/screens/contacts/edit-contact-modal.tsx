@@ -14,7 +14,7 @@ import {
 } from "heroui-native";
 import { View, ScrollView } from "react-native";
 import { regex } from "arkregex";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
 import { ExistingPhone } from "expo-contacts";
 import { Stack } from "expo-router";
@@ -85,6 +85,8 @@ export default function EditContactModal() {
   const resizedImageUri = useStore(contactStore, (state) => state.resizedImageUri);
   const setResizedImageUri = useStore(contactStore, (state) => state.setResizedImageUri);
 
+  const queryClient = useQueryClient();
+
   const { toast } = useToast();
 
   const { data: contactDetails, isLoading } = useQuery({
@@ -109,6 +111,7 @@ export default function EditContactModal() {
         const secondary = value.phones[1] || null;
         const tertiary = value.phones[2] || null;
         await addContact(value.fullname, value.thumbnail, primary, secondary, tertiary);
+        queryClient.invalidateQueries({ queryKey: ["contact-list"] });
       } else {
         toast.show("No contact number entered");
       }

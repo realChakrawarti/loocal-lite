@@ -2,11 +2,12 @@ import { localAuthenticate } from "@/shared/local-authenticate";
 import log from "@/shared/logger";
 import { useRouter } from "expo-router";
 import { Spinner } from "heroui-native/spinner";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useLayoutEffect, useState } from "react";
 import { View, Text } from "react-native";
 import { Image } from "expo-image";
 import { Button, cn } from "heroui-native";
 import { FontAwesome6 } from "@expo/vector-icons";
+import configStore from "@/store/config-store";
 
 enum AuthenticatedState {
   pending,
@@ -19,6 +20,8 @@ export default function SplashScreen() {
   const [authenticated, setAuthenticated] = useState<AuthenticatedState>(
     AuthenticatedState.pending
   );
+
+  const biometricEnabled = configStore.getState().biometricAuthentication;
 
   const handleLocalAuthentication = useCallback(() => {
     localAuthenticate()
@@ -34,9 +37,15 @@ export default function SplashScreen() {
       });
   }, [router]);
 
-  useEffect(() => {
-    handleLocalAuthentication();
-  }, [handleLocalAuthentication]);
+  useLayoutEffect(() => {
+    if (biometricEnabled) {
+      handleLocalAuthentication();
+    } else {
+      setTimeout(() => {
+        router.replace("/(tabs)");
+      }, 1500);
+    }
+  }, [handleLocalAuthentication, biometricEnabled, router]);
 
   const logo = require("../../assets/images/splash-icon.png");
 
