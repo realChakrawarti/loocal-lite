@@ -11,17 +11,19 @@ export function SearchFilterContact({ searchValue, setSearchValue }: SearchConta
   return (
     <View className="gap-4">
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        <View className="flex flex-row gap-2">
-          {["Builder", "Electrician", "Plumber", "Nanny", "Rag-picker"].map((item) => (
-            <Chip variant="soft" key={item}>
-              <Chip.Label>
-                <Text>{item}</Text>
-              </Chip.Label>
-            </Chip>
-          ))}
+        <View className="pl-4 pt-4">
+          <View className="flex flex-row gap-2 pr-4">
+            {["Builder", "Electrician", "Plumber", "Nanny", "Rag-picker"].map((item) => (
+              <Chip variant="soft" key={item}>
+                <Chip.Label>
+                  <Text>{item}</Text>
+                </Chip.Label>
+              </Chip>
+            ))}
+          </View>
         </View>
       </ScrollView>
-      <SearchField value={searchValue} onChange={setSearchValue}>
+      <SearchField className="px-4" value={searchValue} onChange={setSearchValue}>
         <SearchField.Group>
           <SearchField.SearchIcon />
           <SearchField.Input className="text-base" placeholder="Search by name or profession" />

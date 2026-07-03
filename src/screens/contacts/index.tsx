@@ -4,7 +4,7 @@ import { ContactList } from "./contact-list";
 
 export default function ContactScreen() {
   return (
-    <View className="relative flex-1 p-4">
+    <View className="relative flex-1">
       <ContactList />
       <View className="absolute right-4 bottom-4">
         <AddContactPopover />

@@ -24,14 +24,6 @@ export default function ControlFieldExample() {
           </View>
           <ControlField.Indicator />
         </ControlField>
-        <ControlField isSelected={newsletter} onSelectedChange={setNewsletter}>
-          <View className="flex-1">
-            <Label>Subscribe to newsletter</Label>
-          </View>
-          <ControlField.Indicator>
-            <Checkbox />
-          </ControlField.Indicator>
-        </ControlField>
         <Button onPress={() => reloadAppAsync("Reloading application")} variant="primary">
           <Button.Label>Reload application</Button.Label>
         </Button>
