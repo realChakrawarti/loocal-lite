@@ -3,6 +3,9 @@
 # Dependencies
 node_modules/
 
+# Beads
+.beads
+
 # Expo
 .expo/
 dist/

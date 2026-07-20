@@ -19,6 +19,15 @@ export default function RootLayout() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
         <Stack.Screen
+          name="details-contact"
+          options={{
+            headerLargeTitleEnabled: true,
+            headerShown: true,
+            presentation: "modal",
+            animation: "slide_from_bottom",
+          }}
+        />
+        <Stack.Screen
           name="edit-contact"
           listeners={{
             beforeRemove: () => {

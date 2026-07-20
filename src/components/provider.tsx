@@ -4,6 +4,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { Uniwind } from "uniwind";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 
 const config = {
   devInfo: {
@@ -27,7 +28,9 @@ export default function Provider({ children }: PropsWithChildren) {
       <HeroUINativeProvider config={config}>
         <SafeAreaProvider>
           <QueryClientProvider client={queryClient}>
-            <SafeAreaView style={{ flex: 1 }}>{children}</SafeAreaView>
+            <SafeAreaView style={{ flex: 1 }}>
+              <KeyboardProvider>{children}</KeyboardProvider>
+            </SafeAreaView>
           </QueryClientProvider>
         </SafeAreaProvider>
       </HeroUINativeProvider>

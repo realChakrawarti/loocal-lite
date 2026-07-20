@@ -8,6 +8,7 @@
     "scheme": "loocal-lite",
     "userInterfaceStyle": "automatic",
     "android": {
+      "softwareKeyboardLayoutMode": "pan",
       "predictiveBackGestureEnabled": false,
       "package": "in.lite.loocal"
     },

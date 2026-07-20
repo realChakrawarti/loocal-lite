@@ -4,7 +4,7 @@ import { deleteDatabaseSync } from "expo-sqlite";
 export async function getAllTableNames() {
   const db = getDb();
   if (!db) {
-    return;
+    return null;
   }
 
   const result = await db.getAllAsync<{ name: string }>(

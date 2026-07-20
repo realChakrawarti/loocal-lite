@@ -25,6 +25,7 @@ const contact = {
 		id TEXT PRIMARY KEY,
 		fullname TEXT NOT NULL,
 		thumbnail TEXT,
+		remarks TEXT,
 		primary_number TEXT CHECK(json_valid(primary_number)) NOT NULL,
 		secondary_number TEXT CHECK(secondary_number IS NULL OR json_valid(secondary_number)),
 		tertiary_number TEXT CHECK(tertiary_number IS NULL OR json_valid(tertiary_number)),
@@ -32,9 +33,10 @@ const contact = {
     updated_at INTEGER DEFAULT (strftime('%s','now'))
 	);
 	`,
+  getById: "SELECT * FROM contacts WHERE id = ?;",
   getAll: "SELECT * FROM contacts;",
   insert:
-    "INSERT INTO contacts (id, fullname, thumbnail, primary_number, secondary_number, tertiary_number) VALUES (?, ?, ?, ?, ?, ?);",
+    "INSERT INTO contacts (id, fullname, thumbnail, remarks, primary_number, secondary_number, tertiary_number) VALUES (?, ?, ?, ?, ?, ?, ?);",
 };
 
 const sqlStatements = {
