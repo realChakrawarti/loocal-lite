@@ -43,6 +43,16 @@ export default function RootLayout() {
           }}
         />
         <Stack.Screen
+          name="manage-tags"
+          options={{
+            headerLargeTitleEnabled: true,
+            title: "Manage Tags",
+            headerShown: true,
+            presentation: "modal",
+            animation: "slide_from_bottom",
+          }}
+        />
+        <Stack.Screen
           name="settings"
           listeners={{
             beforeRemove: () => {

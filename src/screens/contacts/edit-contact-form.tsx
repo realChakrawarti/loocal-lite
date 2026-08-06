@@ -1,6 +1,6 @@
 import { ContactAvatar } from "@/components/contact-avatar";
 import PhoneInput from "@/components/phone-input";
-import { FontAwesome6 } from "@expo/vector-icons";
+import FontAwesome6 from "@react-native-vector-icons/fontawesome6";
 import { Button } from "heroui-native/button";
 import { ControlField } from "heroui-native/control-field";
 import { Description } from "heroui-native/description";
@@ -15,10 +15,18 @@ import { useStore } from "zustand/react";
 import contactStore from "@/store/contact-store";
 import { useForm } from "@tanstack/react-form";
 import { useToast } from "heroui-native/toast";
-import { useQueryClient } from "@tanstack/react-query";
-import { addContact, ContactNumber } from "@/database/query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { addContact, updateContact } from "@/database/query";
 import { useEffect, useState } from "react";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
+import { Select } from "heroui-native/select";
+import { ContactNumber, TagsType } from "@/database/types";
+import { getAllTags } from "@/database/query/tags";
+import { Chip } from "heroui-native/chip";
+import { Typography } from "heroui-native/text";
+import MaterialIcons from "@react-native-vector-icons/material-icons";
+import MaterialDesignIcons from "@react-native-vector-icons/material-design-icons";
+import { Dialog } from "heroui-native/dialog";
 
 const phoneMaps = new Map([
   ["1", "Primary number"],
@@ -27,25 +35,40 @@ const phoneMaps = new Map([
 ]);
 
 interface EditContactFormProps {
+  id?: string;
   fullname: string;
   thumbnail: string;
   phoneNumbers: ContactNumber[];
-  remarks: string;
+  remarks?: string;
 }
 
 export default function EditContactForm({
+  id,
   fullname,
   thumbnail,
   phoneNumbers,
   remarks,
 }: EditContactFormProps) {
   const [showCameraModal, setShowCameraModal] = useState(false);
+  const [tagModalOpen, setTagModalOpen] = useState(false);
 
   const setResizedImageUri = useStore(contactStore, (state) => state.setResizedImageUri);
   const resizedImageUri = useStore(contactStore, (state) => state.resizedImageUri);
 
+  const contactTags = useStore(contactStore, (state) => state.contactTags);
+  const setContactTags = useStore(contactStore, (state) => state.setContactTags);
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const router = useRouter();
+
+  const { data: tagList } = useQuery({
+    queryKey: ["tag-list"],
+    queryFn: async () => {
+      const result = await getAllTags();
+      return result;
+    },
+  });
 
   async function pickFromGallery() {
     const imageUri = await imagePicker();
@@ -85,15 +108,34 @@ export default function EditContactForm({
         const primary = value.phones[0];
         const secondary = value.phones[1] || null;
         const tertiary = value.phones[2] || null;
-        await addContact(
-          value.fullname,
-          value.thumbnail,
-          value.remarks,
-          primary,
-          secondary,
-          tertiary
-        );
+
+        // Update existing contact
+        if (id) {
+          await updateContact(
+            id,
+            value.fullname,
+            value.thumbnail,
+            value.remarks || null,
+            primary,
+            secondary,
+            tertiary,
+            contactTags
+          );
+          toast.show("Contact updated successfully.");
+        } else {
+          await addContact(
+            value.fullname,
+            value.thumbnail,
+            value.remarks || null,
+            primary,
+            secondary,
+            tertiary,
+            contactTags
+          );
+          toast.show("Contact added successfully.");
+        }
         queryClient.invalidateQueries({ queryKey: ["contact-list"] });
+        router.replace("/(tabs)");
       } else {
         toast.show("No contact number entered");
       }
@@ -138,7 +180,7 @@ export default function EditContactForm({
                 onPress={() => setShowCameraModal(true)}
                 variant="outline"
               >
-                <FontAwesome6 name="camera" size={20} color="black" />
+                <FontAwesome6 iconStyle="solid" name="camera" size={20} color="black" />
               </Button>
 
               <Button
@@ -158,7 +200,7 @@ export default function EditContactForm({
                       variant="outline"
                       onPress={resetContactImage}
                     >
-                      <FontAwesome6 name="trash" size={20} color="black" />
+                      <FontAwesome6 iconStyle="solid" name="trash" size={20} color="black" />
                     </Button>
                   ) : null
                 }
@@ -170,7 +212,11 @@ export default function EditContactForm({
               name="fullname"
               children={({ state, handleChange }) => (
                 <TextField isRequired>
-                  <Label>Full name</Label>
+                  <Label>
+                    <Label.Text>
+                      <Typography type="h5">Full name</Typography>
+                    </Label.Text>
+                  </Label>
                   <Input
                     className="text-base"
                     value={state.value}
@@ -180,6 +226,7 @@ export default function EditContactForm({
                 </TextField>
               )}
             />
+
             <form.Field
               name="phones"
               mode="array"
@@ -195,7 +242,13 @@ export default function EditContactForm({
                                 console.log("state", state);
                                 return (
                                   <TextField isRequired={idx + 1 === 1}>
-                                    <Label>{phoneMaps.get(`${idx + 1}`)}</Label>
+                                    <Label>
+                                      <Label.Text>
+                                        <Typography type="h5">
+                                          {phoneMaps.get(`${idx + 1}`)}
+                                        </Typography>
+                                      </Label.Text>
+                                    </Label>
                                     <PhoneInput
                                       className="text-base"
                                       trigger={() => removeValue(idx)}
@@ -220,7 +273,12 @@ export default function EditContactForm({
                                       <ControlField.Indicator variant="checkbox" />
                                       <View className="flex-1 gap-2">
                                         <View className="flex flex-row gap-2 items-center ">
-                                          <FontAwesome6 name="whatsapp" size={20} color="green" />
+                                          <FontAwesome6
+                                            iconStyle="brand"
+                                            name="whatsapp"
+                                            size={20}
+                                            color="green"
+                                          />
                                           <Label>Whatsapp</Label>
                                         </View>
                                         <Description>
@@ -241,25 +299,84 @@ export default function EditContactForm({
                       >
                         Add phone
                       </Button>
+                      <form.Field
+                        name="remarks"
+                        children={({ state, handleChange }) => (
+                          <TextField>
+                            <Label>
+                              <Label.Text>
+                                <Typography type="h5">Remarks</Typography>
+                              </Label.Text>
+                            </Label>
+                            <Input
+                              multiline
+                              numberOfLines={2}
+                              className="text-base"
+                              value={state.value}
+                              onChangeText={handleChange}
+                              placeholder="Add note"
+                            />
+                          </TextField>
+                        )}
+                      />
                     </View>
-                    <form.Field
-                      name="remarks"
-                      children={({ state, handleChange }) => (
-                        <TextField>
-                          <Label>Remarks</Label>
-                          <Input
-                            className="text-base"
-                            value={state.value}
-                            onChangeText={handleChange}
-                            placeholder="Add note"
-                          />
-                        </TextField>
-                      )}
-                    />
                   </KeyboardAwareScrollView>
                 );
               }}
             />
+
+            <Label>
+              <Label.Text>
+                <Typography type="h5">Tags</Typography>
+              </Label.Text>
+            </Label>
+            <View className="flex flex-row gap-2 flex-wrap">
+              {contactTags.map((tag) => (
+                <Chip className="border border-primary" variant="soft" key={tag.id}>
+                  <Chip.Label className="text-base">{tag.name}</Chip.Label>
+                  <Button
+                    onPress={() => {
+                      setContactTags(contactTags.filter((prevTag) => prevTag.id !== tag.id));
+                    }}
+                    variant="ghost"
+                    className="h-full px-1"
+                  >
+                    <MaterialDesignIcons name="close" size={18} />
+                  </Button>
+                </Chip>
+              ))}
+              <Chip className="border border-primary" variant="tertiary">
+                <Button
+                  className="h-full px-1"
+                  variant="ghost"
+                  onPress={() => setTagModalOpen(true)}
+                >
+                  <MaterialIcons name="add" size={18} />
+                  <Chip.Label className="text-base">Add</Chip.Label>
+                </Button>
+              </Chip>
+              <Dialog isOpen={tagModalOpen} onOpenChange={setTagModalOpen}>
+                <Dialog.Portal>
+                  <Dialog.Overlay />
+                  <Dialog.Content className="bg-background p-4">
+                    <Dialog.Title className="mb-3">Select tags</Dialog.Title>
+                    <View className="flex flex-row gap-2 flex-wrap">
+                      {tagList?.map((tag) => (
+                        <Chip
+                          disabled={contactTags.includes(tag)}
+                          onPress={() => setContactTags([...contactTags, tag])}
+                          className="border border-primary"
+                          variant={contactTags.includes(tag) ? "secondary" : "soft"}
+                          key={tag.id}
+                        >
+                          <Chip.Label className="text-base">{tag.name}</Chip.Label>
+                        </Chip>
+                      ))}
+                    </View>
+                  </Dialog.Content>
+                </Dialog.Portal>
+              </Dialog>
+            </View>
           </View>
         </View>
       </ScrollView>

@@ -1,12 +1,13 @@
 import AddCTA from "@/components/add-cta";
-import { FontAwesome6 } from "@expo/vector-icons";
+import MaterialDesignIcons from "@react-native-vector-icons/material-design-icons";
 import { ListGroup } from "heroui-native/list-group";
 import { Separator } from "heroui-native/separator";
 import useContactService from "@/hooks/services/use-contact";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { router } from "expo-router";
 import { PopoverTriggerRef } from "heroui-native/popover";
 import contactStore from "@/store/contact-store";
+import ScanQRModal from "./scan-qr-modal";
 
 export function AddContactPopover() {
   const { contactPicker, requestContactPermission, getContactPermissionStatus, openSettings } =
@@ -45,31 +46,49 @@ export function AddContactPopover() {
     router.push("/edit-contact");
   }
 
+  function handleQRCode() {
+    popoverRef.current?.close();
+    router.push("/scan-qr");
+  }
+
   return (
-    <AddCTA ref={popoverRef}>
-      <ListGroup>
-        <ListGroup.Item onPress={handleContactPicker}>
-          <ListGroup.ItemPrefix>
-            <FontAwesome6 name="contact-book" size={24} color="black" />
-          </ListGroup.ItemPrefix>
-          <ListGroup.ItemContent>
-            <ListGroup.ItemTitle>Contact Picker</ListGroup.ItemTitle>
-            <ListGroup.ItemDescription>Pick contact from the contacts</ListGroup.ItemDescription>
-          </ListGroup.ItemContent>
-          <ListGroup.ItemSuffix />
-        </ListGroup.Item>
-        <Separator className="mx-2" />
-        <ListGroup.Item onPress={handleManualContact}>
-          <ListGroup.ItemPrefix>
-            <FontAwesome6 name="contact-card" size={24} color="black" />
-          </ListGroup.ItemPrefix>
-          <ListGroup.ItemContent>
-            <ListGroup.ItemTitle>Add contact</ListGroup.ItemTitle>
-            <ListGroup.ItemDescription>Manually add a contact</ListGroup.ItemDescription>
-          </ListGroup.ItemContent>
-          <ListGroup.ItemSuffix />
-        </ListGroup.Item>
-      </ListGroup>
-    </AddCTA>
+    <>
+      <AddCTA ref={popoverRef}>
+        <ListGroup>
+          <ListGroup.Item onPress={handleContactPicker}>
+            <ListGroup.ItemPrefix>
+              <MaterialDesignIcons name="phone-log" size={24} color="black" />
+            </ListGroup.ItemPrefix>
+            <ListGroup.ItemContent>
+              <ListGroup.ItemTitle>Contact Picker</ListGroup.ItemTitle>
+              <ListGroup.ItemDescription>Pick contact from the contacts</ListGroup.ItemDescription>
+            </ListGroup.ItemContent>
+            <ListGroup.ItemSuffix />
+          </ListGroup.Item>
+          <Separator className="mx-2" />
+          <ListGroup.Item onPress={handleManualContact}>
+            <ListGroup.ItemPrefix>
+              <MaterialDesignIcons name="phone-plus" size={24} color="black" />
+            </ListGroup.ItemPrefix>
+            <ListGroup.ItemContent>
+              <ListGroup.ItemTitle>Add contact</ListGroup.ItemTitle>
+              <ListGroup.ItemDescription>Manually add a contact</ListGroup.ItemDescription>
+            </ListGroup.ItemContent>
+            <ListGroup.ItemSuffix />
+          </ListGroup.Item>
+          <Separator className="mx-2" />
+          <ListGroup.Item onPress={handleQRCode}>
+            <ListGroup.ItemPrefix>
+              <MaterialDesignIcons name="qrcode" size={24} color="black" />
+            </ListGroup.ItemPrefix>
+            <ListGroup.ItemContent>
+              <ListGroup.ItemTitle>Scan QR code</ListGroup.ItemTitle>
+              <ListGroup.ItemDescription>Scan a QR code to add contact</ListGroup.ItemDescription>
+            </ListGroup.ItemContent>
+            <ListGroup.ItemSuffix />
+          </ListGroup.Item>
+        </ListGroup>
+      </AddCTA>
+    </>
   );
 }

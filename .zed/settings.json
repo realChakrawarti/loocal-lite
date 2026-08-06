@@ -1,0 +1,13 @@
+{
+  "language_servers": [
+    "!vtsls",
+    "just-lsp",
+    "oxlint",
+    "oxfmt",
+    "tailwindcss-language-server",
+    "json-language-server",
+    "package-version-server",
+    "eslint",
+    "typescript-ls",
+  ],
+}

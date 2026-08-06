@@ -1,7 +1,8 @@
 import { Tabs, useRouter } from "expo-router";
-import { FontAwesome6 } from "@expo/vector-icons";
+import Lucide from "@react-native-vector-icons/lucide";
 import { TouchableOpacity } from "react-native";
 import { Button } from "heroui-native";
+import MaterialDesignIcons from "@react-native-vector-icons/material-design-icons";
 
 const iconSize = 20;
 
@@ -13,7 +14,7 @@ export default function TabsLayout() {
       screenOptions={{
         headerRight: () => (
           <Button variant="ghost" onPress={() => router.push("/settings")}>
-            <FontAwesome6 name="gears" size={24} color="black" />
+            <Lucide name="settings-2" size={24} color="black" />
           </Button>
         ),
         tabBarPosition: "bottom",
@@ -26,7 +27,7 @@ export default function TabsLayout() {
         options={{
           title: "Contacts",
           tabBarIcon: ({ color }) => (
-            <FontAwesome6 name="contact-book" size={iconSize} color={color} />
+            <MaterialDesignIcons name="phone" size={iconSize} color={color} />
           ),
         }}
       />
@@ -34,7 +35,9 @@ export default function TabsLayout() {
         name="chats"
         options={{
           title: "Chats",
-          tabBarIcon: ({ color }) => <FontAwesome6 name="message" size={iconSize} color={color} />,
+          tabBarIcon: ({ color }) => (
+            <MaterialDesignIcons name="message" size={iconSize} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
@@ -42,7 +45,7 @@ export default function TabsLayout() {
         options={{
           title: "Locations",
           tabBarIcon: ({ color }) => (
-            <FontAwesome6 name="map-location-dot" size={iconSize} color={color} />
+            <MaterialDesignIcons name="map" size={iconSize} color={color} />
           ),
         }}
       />

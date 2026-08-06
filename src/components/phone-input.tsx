@@ -1,4 +1,4 @@
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import MaterialCommunityIcons from "@react-native-vector-icons/material-design-icons";
 import { InputGroup, InputGroupInputProps } from "heroui-native/input-group";
 import { KeyboardAvoidingView, Pressable } from "react-native";
 

@@ -4,7 +4,8 @@ import { ExistingPhone } from "expo-contacts";
 import EditContactForm from "./edit-contact-form";
 import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
-import { ContactNumber, getContactDetailsById } from "@/database/query";
+import { getContactDetailsById } from "@/database/query";
+import { ContactNumber } from "@/database/types";
 
 function normalizePhoneNumber(phone: string) {
   const phoneRegex = regex("^(?:\\+91|0)?([6-9]\\d{9})$");
@@ -62,23 +63,23 @@ function phonesArray(
   if (tertiary_number) {
     phones.push(tertiary_number);
   }
-
-  console.log("Phones", phones);
   return phones;
 }
 
 export default function EditContactModal() {
   const contact = contactStore.getState().contact;
+  const setContactTags = contactStore.getState().setContactTags;
 
   const { id } = useLocalSearchParams();
 
-  const { data: savedContact, isSavedLoading } = useQuery({
+  const { data: savedContact } = useQuery({
     queryKey: ["saved-contact", id],
     queryFn: async () => {
       const result = await getContactDetailsById(id.toString());
       if (!result) {
-        return { fullname: "", thumbnail: "", phones: [], remarks: "" };
+        return { fullname: "", thumbnail: "", phones: [], remarks: "", tags: [] };
       }
+      setContactTags(result.tags);
       return {
         fullname: result.fullname,
         thumbnail: result.thumbnail,
@@ -88,12 +89,13 @@ export default function EditContactModal() {
           result?.tertiary_number
         ),
         remarks: result.remarks,
+        tags: result.tags,
       };
     },
     enabled: Boolean(id),
   });
 
-  const { data: loadedContact, isLoadedLoading } = useQuery({
+  const { data: loadedContact } = useQuery({
     queryKey: ["contact"],
     queryFn: async () => ({
       fullname: (await contact?.getFullName()) ?? "",
@@ -108,6 +110,7 @@ export default function EditContactModal() {
       {/*Updation of existing or already added contact*/}
       {id ? (
         <EditContactForm
+          id={id.toString()}
           remarks={savedContact?.remarks ?? ""}
           fullname={savedContact?.fullname ?? ""}
           thumbnail={savedContact?.thumbnail ?? ""}
@@ -119,7 +122,6 @@ export default function EditContactModal() {
           fullname={loadedContact?.fullname ?? ""}
           thumbnail={loadedContact?.thumbnail ?? ""}
           phoneNumbers={phones(loadedContact?.phones)}
-          remarks={""}
         />
       )}
     </>

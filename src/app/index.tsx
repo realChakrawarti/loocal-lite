@@ -6,7 +6,7 @@ import { useCallback, useLayoutEffect, useState } from "react";
 import { View, Text } from "react-native";
 import { Image } from "expo-image";
 import { Button, cn } from "heroui-native";
-import { FontAwesome6 } from "@expo/vector-icons";
+import Lucide from "@react-native-vector-icons/lucide";
 import configStore from "@/store/config-store";
 
 enum AuthenticatedState {
@@ -20,8 +20,6 @@ export default function SplashScreen() {
   const [authenticated, setAuthenticated] = useState<AuthenticatedState>(
     AuthenticatedState.pending
   );
-
-  const biometricEnabled = configStore.getState().biometricAuthentication;
 
   const handleLocalAuthentication = useCallback(() => {
     localAuthenticate()
@@ -38,6 +36,8 @@ export default function SplashScreen() {
   }, [router]);
 
   useLayoutEffect(() => {
+    const biometricEnabled = configStore.getState().biometricAuthentication;
+    console.log("Biometric Enabled", biometricEnabled);
     if (biometricEnabled) {
       handleLocalAuthentication();
     } else {
@@ -45,7 +45,7 @@ export default function SplashScreen() {
         router.replace("/(tabs)");
       }, 1500);
     }
-  }, [handleLocalAuthentication, biometricEnabled, router]);
+  }, [handleLocalAuthentication, router]);
 
   const logo = require("../../assets/images/splash-icon.png");
 
@@ -79,8 +79,8 @@ export default function SplashScreen() {
               handleLocalAuthentication();
             }}
           >
-            <View className="size-18 items-center justify-center rounded-full bg-teal-300/20">
-              <FontAwesome6 name="fingerprint" size={40} color="#6e6e6eaa" />
+            <View className="size-18 items-center justify-center rounded-full bg-red-400/40">
+              <Lucide name="fingerprint" size={40} color="black" />
             </View>
             <Text className="tracking-wide text-[#6e6e6eaa]">Authenticate to continue</Text>
           </Button>

@@ -44,7 +44,8 @@
       ],
       "expo-sqlite",
       "@maplibre/maplibre-react-native",
-      "expo-image"
+      "expo-image",
+      "@react-native-vector-icons/lucide"
     ],
     "experiments": {
       "typedRoutes": true,

@@ -6,7 +6,7 @@ import { Text, View, StyleSheet } from "react-native";
 import { Image } from "expo-image";
 import ViewModal from "@/components/modal";
 import contactStore from "@/store/contact-store";
-import { FontAwesome6 } from "@expo/vector-icons";
+import FontAwesome6 from "@react-native-vector-icons/fontawesome6";
 import { useEffectOnce } from "@/hooks/use-effect-once";
 import { deleteImage, resizeImage } from "@/shared/image-utils";
 
@@ -89,7 +89,7 @@ export default function ContactCaptureModal({
                   variant="ghost"
                   onPress={() => setFrontCamera(!frontCamera)}
                 >
-                  <FontAwesome6 name="camera-rotate" size={24} color="#fef3c6" />
+                  <FontAwesome6 iconStyle="solid" name="camera-rotate" size={24} color="#fef3c6" />
                 </Button>
               </View>
             ) : null}

@@ -1,4 +1,4 @@
-import { FontAwesome6 } from "@expo/vector-icons";
+import Lucide from "@react-native-vector-icons/lucide";
 import { Avatar, useAvatar } from "heroui-native/avatar";
 import { Skeleton } from "heroui-native/skeleton";
 
@@ -28,7 +28,7 @@ export function ContactAvatar({ name, thumbnail, iconSize, className }: ContactA
       />
       <AvatarContent />
       <Avatar.Fallback delayMs={300}>
-        <FontAwesome6 name="user-circle" size={iconSize} color="black" />
+        <Lucide name="circle-user" size={iconSize} color="black" />
       </Avatar.Fallback>
     </Avatar>
   );
