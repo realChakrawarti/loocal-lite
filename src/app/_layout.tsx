@@ -28,6 +28,16 @@ export default function RootLayout() {
           }}
         />
         <Stack.Screen
+          name="scan-qr"
+          options={{
+            headerLargeTitleEnabled: true,
+            title: "Scan QR code",
+            headerShown: true,
+            presentation: "modal",
+            animation: "slide_from_bottom",
+          }}
+        />
+        <Stack.Screen
           name="edit-contact"
           listeners={{
             beforeRemove: () => {

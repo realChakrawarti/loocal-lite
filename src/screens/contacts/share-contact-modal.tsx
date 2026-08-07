@@ -1,5 +1,6 @@
 import { ContactNumber, ContactsType, TagsType } from "@/database/types";
-import { createVCard, parseVCard } from "@/shared/vcard";
+import { createVCard, parseVCard, shareVCard } from "@/shared/vcard";
+import { Button } from "heroui-native/button";
 import { Popover } from "heroui-native/popover";
 import { Typography } from "heroui-native/text";
 import { View, Text, ScrollView } from "react-native";
@@ -38,18 +39,20 @@ export default function ShareContactModal({ open, setOpen, contact }: ShareConta
     tags: contact.tags,
   });
 
-  console.log(">>>>>>vCard<<<<<<", vCard)
+  console.log(">> : vCard", vCard);
 
   return (
     <Popover isOpen={open} onOpenChange={setOpen} presentation="bottom-sheet">
       <Popover.Portal>
         <Popover.Overlay />
         <Popover.Content contentContainerClassName="p-0" presentation="bottom-sheet">
-          <ScrollView className="p-2">
-          	<Typography type="h4">{contact.fullname}</Typography>
-           	<QRCode value={vCard} size={192} />
-            <Text>{JSON.stringify(parseVCard(vCard), null, 2)}</Text>
-          </ScrollView>
+          <View className="p-2 flex flex-1 items-center gap-4">
+            <Typography className="font-semibold text-center" type="h3">
+              {contact.fullname}
+            </Typography>
+            <QRCode value={vCard} size={192} />
+            <Button onPress={() => shareVCard(vCard, contact.fullname)}>Share contact</Button>
+          </View>
         </Popover.Content>
       </Popover.Portal>
     </Popover>

@@ -42,6 +42,7 @@
     "expo-local-authentication": "~56.0.4",
     "expo-location": "~56.0.21",
     "expo-router": "~56.2.15",
+    "expo-sharing": "~56.0.24",
     "expo-splash-screen": "~56.0.13",
     "expo-sqlite": "~56.0.5",
     "expo-status-bar": "~56.0.4",

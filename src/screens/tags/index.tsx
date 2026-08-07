@@ -14,11 +14,7 @@ import MaterialDesignIcons from "@react-native-vector-icons/material-design-icon
 export default function TagScreen() {
   const [isOpen, setIsOpen] = useState(false);
 
-  const {
-    data: tags,
-    refetch,
-    isLoading,
-  } = useQuery({
+  const { data: tags, refetch } = useQuery({
     queryKey: ["tag-list"],
     queryFn: async () => {
       const result = await getAllTags();

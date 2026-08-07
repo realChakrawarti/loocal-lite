@@ -11,9 +11,14 @@ import {
   TextListType,
   TextType,
   parse,
-  // TypeParameter,
   URIType,
+  NProperty,
+  SpecialValueType,
+  ExtendedProperty,
 } from "vcard4";
+
+import * as Sharing from "expo-sharing";
+import { File, Paths } from "expo-file-system";
 
 type CreateVCardArgs = {
   fullname: string;
@@ -23,67 +28,54 @@ type CreateVCardArgs = {
   tags: TagsType[];
 };
 
-const phoneMaps = new Map([
-  ["1", "Primary"],
-  ["2", "Secondary"],
-  ["3", "Tertiary"],
-]);
-
 function createVCard({ fullname, thumbnail, phones, remarks, tags }: CreateVCardArgs) {
   const properties: any[] = [];
 
-  // 1. Full Name (FN) - Required
+  // 1. Full Name
   properties.push(new FNProperty([], new TextType(fullname)));
 
-  // 2. Photo (PHOTO)
-  if (thumbnail) {
-    // Using URIType is valid for vCard 4.0 if the client supports remote images.
-    // If compatibility is an issue, convert the image to a Base64 Data URI string first.
-    properties.push(new PhotoProperty([], new URIType(thumbnail)));
+  // 2. First name, last name
+  const [firstName, ...lastName] = fullname.split(" ");
+
+  const nameArray = Array.from({ length: 5 });
+  if (lastName.length) {
+    nameArray[0] = new TextType(lastName.join(" "));
   }
+  nameArray[1] = new TextType(firstName);
+  const name = new NProperty([], new SpecialValueType("NProperty", nameArray));
 
-  // phone numbers
-  phones.forEach((phone, idx) => {
-    const params: AnyParameter[] = [];
+  properties.push(name);
 
-    // Determine the label (Primary, Secondary, etc.)
-    const label = phoneMaps.get(`${idx + 1}`);
+  // TODO: Optionally attach image, when shared via QR (No) vs shared as .vcf (Yes?)
+  // if (thumbnail) {
+  //   properties.push(new PhotoProperty([], new URIType(thumbnail)));
+  // }
 
-    // vcard4 requires a separate TypeParameter instance for each type value
-    // Add the label type (e.g., "Primary number" or "Home")
-    // params.push(new TypeParameter("TelProperty", new ParameterValueType(label)));
-
-    // // Add the "voice" type
-    // params.push(new TypeParameter("TelProperty", new ParameterValueType("voice")));
-
-    // Add custom WhatsApp parameter if present
-    if (phone.platform.whatsapp) {
-      params.push(new AnyParameter("X-WHATSAPP", new ParameterValueType("TRUE")));
-    }
-
-    // Create TelProperty with the flat array of parameters
-    // Note: Ensure phone.number is a string. If it's a URI, use URIType, otherwise TextType is standard for TEL in v4.
-    // properties.push(new TelProperty(params, new TextType(phone.number)));
-
-    const telHome = new TelProperty(
-      [new AnyParameter(`X-${label}`, new ParameterValueType(phone.number))],
-      new URIType(`tel:${phone.number}`)
-    );
-    properties.push(telHome);
+  // 3. Phone numbers
+  phones.forEach((phone) => {
+    const tel = new TelProperty([], new TextType(phone.number));
+    properties.push(tel);
   });
 
-  // 4. Remarks (NOTE)
+  // 4. Remarks
   if (remarks) {
     properties.push(new NoteProperty([], new TextType(remarks)));
   }
 
-  // 5. Tags (CATEGORIES)
+  // 5. Tags
   if (tags.length) {
     const categoryList = new TextListType(tags.map((tag) => new TextType(tag.name)));
     properties.push(new CategoriesProperty([], categoryList));
   }
 
-  // Generate the vCard string
+  // 6. Custom Loocal specific JSON
+  const customJSON = {
+    tags: tags.map((tag) => tag.name),
+    phones: phones.map((phone) => ({ whatsapp: phone.platform.whatsapp, number: phone.number })),
+  };
+
+  properties.push(new ExtendedProperty("X-LOOCAL", [], new TextType(JSON.stringify(customJSON))));
+
   return new VCARD(properties).repr();
 }
 
@@ -91,4 +83,33 @@ function parseVCard(contact: string) {
   return parse(contact);
 }
 
-export { createVCard, parseVCard };
+async function shareVCard(vCardString: string, name: string = "contact") {
+  const vCard3 = vCardString.replace(/VERSION:4\.0/, "VERSION:3.0");
+  const isAvailable = await Sharing.isAvailableAsync();
+  if (!isAvailable) {
+    alert("Sharing is not available on this device");
+    return;
+  }
+
+  const file = new File(Paths.cache, `${name}.vcf`);
+  if (!file.exists) {
+    file.create();
+  }
+  file.write(vCard3);
+
+  try {
+    await Sharing.shareAsync(file.uri, {
+      mimeType: "text/vcard",
+      dialogTitle: "Share Contact",
+      UTI: "public.vcard",
+    });
+  } catch (error) {
+    alert(error);
+  } finally {
+    if (file.exists) {
+      file.delete();
+    }
+  }
+}
+
+export { createVCard, parseVCard, shareVCard };

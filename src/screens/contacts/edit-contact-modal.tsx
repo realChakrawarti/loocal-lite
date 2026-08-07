@@ -66,11 +66,19 @@ function phonesArray(
   return phones;
 }
 
+type SearchParams = {
+  id: string;
+  phones: ContactNumber[];
+  fullname: string;
+  remarks: string;
+  type: "create" | "update" | "qr";
+};
+
 export default function EditContactModal() {
   const contact = contactStore.getState().contact;
   const setContactTags = contactStore.getState().setContactTags;
 
-  const { id } = useLocalSearchParams();
+  const { id, contactPhones, fullname, remarks, type } = useLocalSearchParams();
 
   const { data: savedContact } = useQuery({
     queryKey: ["saved-contact", id],
@@ -105,25 +113,37 @@ export default function EditContactModal() {
     enabled: Boolean(!id),
   });
 
-  return (
-    <>
-      {/*Updation of existing or already added contact*/}
-      {id ? (
-        <EditContactForm
-          id={id.toString()}
-          remarks={savedContact?.remarks ?? ""}
-          fullname={savedContact?.fullname ?? ""}
-          thumbnail={savedContact?.thumbnail ?? ""}
-          phoneNumbers={savedContact?.phones ?? []}
-        />
-      ) : (
-        // To be added manually or using contact picker for the first time
-        <EditContactForm
-          fullname={loadedContact?.fullname ?? ""}
-          thumbnail={loadedContact?.thumbnail ?? ""}
-          phoneNumbers={phones(loadedContact?.phones)}
-        />
-      )}
-    </>
-  );
+  if (id) {
+    {
+      /*Updation of existing or already added contact*/
+    }
+    return (
+      <EditContactForm
+        id={id.toString()}
+        remarks={savedContact?.remarks ?? ""}
+        fullname={savedContact?.fullname ?? ""}
+        thumbnail={savedContact?.thumbnail ?? ""}
+        phoneNumbers={savedContact?.phones ?? []}
+      />
+    );
+    // Populate data from QR code parsed
+  } else if (type === "qr") {
+    return (
+      <EditContactForm
+        remarks={remarks?.toString() ?? ""}
+        fullname={fullname?.toString() ?? ""}
+        thumbnail={""}
+        phoneNumbers={JSON.parse(contactPhones.toString()) ?? []}
+      />
+    );
+  } else {
+    return (
+      // To be added manually or using contact picker for the first time
+      <EditContactForm
+        fullname={loadedContact?.fullname ?? ""}
+        thumbnail={loadedContact?.thumbnail ?? ""}
+        phoneNumbers={phones(loadedContact?.phones)}
+      />
+    );
+  }
 }
